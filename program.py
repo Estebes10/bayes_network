@@ -9,7 +9,7 @@ from methods import *
 def bayes(nodes, probabilities, queries):
 	nodes_list = create_nodes(nodes)
 	probabilities_list = parse_probabilities(probabilities)
-	set_parents(nodes_list, probabilities_list)
+	add_parents(nodes_list, probabilities_list)
 	parse_query(queries, nodes_list)
 	return 0
 

@@ -4,7 +4,7 @@ import decimal
 import math
 from node import *
 
-def set_parents(list_nodes, probabilities_list):
+def add_parents(list_nodes, probabilities_list):
 	for node in list_nodes:
 		node.addParentandTable(probabilities_list)
 		node.completeTable()
@@ -25,6 +25,15 @@ def parse_probabilities(probabilities_list):
 
 	return 	statement_list
 
+def print_node_values(list_nodes):
+    for node in list_nodes:
+        print("Node attributes")
+        print("Name = "+node.name)
+        print("Values")
+        print(node.table)
+        print("Is parent? ")
+        print(node.parents)
+
 def get_node(name, list_nodes): # find speciic Node using param Names
 	for element in list_nodes:
 		if element.name == name:
@@ -36,8 +45,8 @@ def get_ancestors(node, list_nodes, ancestors):
 		for parent in node.parents:
 			if parent not in ancestors:
 				ancestors.append(parent)
-			newnode = get_node(parent, list_nodes)
-			get_ancestors(newnode, list_nodes, ancestors)
+			find_node = get_node(parent, list_nodes)
+			get_ancestors(find_node, list_nodes, ancestors)
 	else:
 		if node.name not in ancestors:
 			ancestors.append(node.name)
@@ -57,70 +66,104 @@ def parse_query(query, node_list): # change probability to conditional probabili
 	return 0
 
 def conditional_probability(numerator, denominator, node_list):
-	numeratorhidden = []
-	numeratorgiven = numerator.split(',')
-	for element in numeratorgiven:
+	hidden_numerator = []
+	numerators = numerator.split(',')
+	for element in numerators:
 
 		if "+" in element:
-			auxelement = element.replace('+', "")
+			aux = element.replace('+', "")
 		elif "-" in element:
-			auxelement = element.replace('-', "")
-		node = get_node(auxelement, node_list)
+			aux = element.replace('-', "")
 
+		node = get_node(aux, node_list)
 		ancestors = []
 		if node.parents:
 			get_ancestors(node, node_list, ancestors)
 
 		for ancestor in ancestors:
-
-			if not "+" + ancestor in numeratorgiven and not "-" + ancestor in numeratorgiven and not ancestor in numeratorhidden:
-				numeratorhidden.append(ancestor)
-	if numeratorhidden:
-		permitationsnumerator = create_permutations(numeratorhidden)
-		enumeratorNUvariables = appendgivenandhidden(numeratorgiven, permitationsnumerator)
+			if not "+" + ancestor in numerators and not "-" + ancestor in numerators and not ancestor in hidden_numerator:
+				hidden_numerator.append(ancestor)
+	if hidden_numerator:
+		permu_numer = create_permutations(hidden_numerator)
+		number_enumerators = append_values(numerators, permu_numer)
 	else:
-		enumeratorNUvariables = numeratorgiven
-	numeratorvalue = chain_rule(enumeratorNUvariables, node_list)
+		number_enumerators = numerators
 
+	value_numerators = chain_rule(number_enumerators, node_list)
 	if denominator:
-		denominatorhidden = []
-		denominatorgiven = denominator.split(',')
-		for element in denominatorgiven:
+		hidden_denominator = []
+		denominators = denominator.split(',')
+		for den in denominators:
 
-			if "+" in element:
-				auxelement = element.replace('+', "")
-			elif "-" in element:
-				auxelement = element.replace('-', "")
-			node = get_node(auxelement, node_list)
+			if "+" in den:
+				aux = den.replace('+', "")
+			elif "-" in den:
+				aux = den.replace('-', "")
+			node = get_node(aux, node_list)
 			ancestors = []
 			if node.parents:
 				get_ancestors(node, node_list, ancestors)
 
 			for ancestor in ancestors:
+				if not "+" + ancestor in denominators and not "-" + ancestor in denominators and not ancestor in hidden_denominator:
+					hidden_denominator.append(ancestor)
 
-				if not "+" + ancestor in denominatorgiven and not "-" + ancestor in denominatorgiven and not ancestor in denominatorhidden:
-					denominatorhidden.append(ancestor)
-
-		if denominatorhidden:
-			permitationsdenominator = create_permutations(denominatorhidden)
-			enumeratorDEvariables = appendgivenandhidden(denominatorgiven, permitationsdenominator)
+		if hidden_denominator:
+			permu_deno = create_permutations(hidden_denominator)
+			number_denominators = append_values(denominators, permu_deno)
 		else:
-			enumeratorDEvariables = denominatorgiven
+			number_denominators = denominators
 
-		denominatorvalue = chain_rule(enumeratorDEvariables, node_list)
-	# Add up all permutations
-		if(denominatorvalue == 0.0):
-			denominatorvalue = 1.0
-	else:
-		denominatorvalue = 1.0
+		value_denominator = chain_rule(number_denominators, node_list)
+		# Add up all permutations
+		if(value_denominator == 0.0):
+			value_denominator = 1.0
+	else: # if there is not denominators
+		value_denominator = 1.0
 
-	result = round(numeratorvalue / denominatorvalue, 7)
+	result = round(value_numerators / value_denominator, 7)
 	print(result)
 	return 0
 
+def save_parents_array(list_nodes, node, probabilities, list, val, element = '3'):
+	var = node.replace("+", "")
+	name = var.replace("-", "")
+	find_node = get_node(name, list_nodes)
+
+	if find_node.parents:
+		posibilities = itertools.permutations(range(0, len(find_node.parents)))
+
+		for p in posibilities:
+			parents_array = []
+			for l in p:
+				if val == 1:
+					if "+" + find_node.parents[l] in element:
+						parents_array.append("+"+find_node.parents[l])
+
+					elif "-" + find_node.parents[l] in element:
+						parents_array.append("-"+find_node.parents[l])
+				else:
+					if "+" + find_node.parents[l] in list:
+						parents_array.append("+"+find_node.parents[l])
+					elif "-" + find_node.parents[l] in list:
+						parents_array.append("-"+find_node.parents[l])
+			string = node+"|"
+
+			for i in range(len(parents_array)):
+				string += parents_array[i]
+				if i < len(parents_array) - 1:
+					string += ","
+
+			if string in find_node.table:
+				value = find_node.table[string]
+				probabilities.append(value)
+	else:
+		value = find_node.table[node]
+		probabilities.append(value)
+
 def chain_rule(list_combinations, node_list):
 	probability = 0.0
-	bandera = True
+	flag = True
 
 	multiplier = 1.0
 	proba = []
@@ -129,90 +172,33 @@ def chain_rule(list_combinations, node_list):
 		probabilities = []
 		if type(element) is list:
 			for item in element:
-				var = item.replace("+", "")
-				name = var.replace("-", "")
-				newnode = get_node(name, node_list)
-
-				if newnode.parents:
-					possible_movements = itertools.permutations(range(0, len(newnode.parents)))
-					for p in possible_movements:
-						parents_array = []
-						for l in p:
-							if "+" + newnode.parents[l] in element:
-								parents_array.append("+"+newnode.parents[l])
-
-							elif "-" + newnode.parents[l] in element:
-								parents_array.append("-"+newnode.parents[l])
-						string = item+"|"
-
-						for i in range(len(parents_array)):
-							string += parents_array[i]
-							if i < len(parents_array) - 1:
-								string += ","
-						if string in newnode.table:
-							value = newnode.table[string]
-							probabilities.append(value)
-
-				else:
-					value = newnode.table[item]
-					probabilities.append(value)
+				save_parents_array(node_list, item, probabilities, list_combinations, 1, element)
 			proba.append(probabilities)
 		else:
 			if element:
-				var = element.replace("+", "")
-				name = var.replace("-", "")
-				newnode = get_node(name, node_list)
-
-				if newnode.parents:
-					possible_movements = itertools.permutations(range(0, len(newnode.parents)))
-					for p in possible_movements:
-						parents_array = []
-						for l in p:
-
-							if "+" + newnode.parents[l] in list_combinations:
-								parents_array.append("+"+newnode.parents[l])
-							elif "-" + newnode.parents[l] in list_combinations:
-								parents_array.append("-"+newnode.parents[l])
-						string = element+"|"
-
-						for i in range(len(parents_array)):
-							string += parents_array[i]
-							if i < len(parents_array) - 1:
-								string += ","
-						#print(string)
-						if string in newnode.table:
-							value = newnode.table[string]
-							probabilities.append(value)
-
-				else:
-					value = newnode.table[element]
-					probabilities.append(value)
+				save_parents_array(node_list, element, probabilities, list_combinations, 2)
 				proba.append(probabilities[0])
-	#print(proba)
+
 	multiplier = 1.0
-	for element in proba:
+	for element in proba: # calculate probability for each node
 		if type(element) is list:
-			bandera = True
+			flag = True
 			multiplier = 1.0
 			for item in element:
 				multiplier *= item
 			probability += multiplier
 		else:
-			bandera = False
+			flag = False
 			multiplier *= element
-		#calculate probabilities for each node in the permutation (multiplication)
-		#consider all the parents of each node
-		#check probability table to calculate each node's probability
-	if bandera:
+	if flag:
 		return probability
-
 	else:
 		return multiplier
 
 def reverse(combinations): # reverse combinations
-
 	rev = []
 	aux_list = []
+
 	for element in combinations:
 		aux_list =[]
 		for item in element:
@@ -223,34 +209,34 @@ def reverse(combinations): # reverse combinations
 		rev.append(aux_list)
 	return rev
 
-def create_permutations(hiddenvariables):
+def create_permutations(variables):
 	combinations = []
-	allpositive = copy.deepcopy(hiddenvariables)
-	allnegative = copy.deepcopy(hiddenvariables)
+	positives = copy.deepcopy(variables)
+	negatives = copy.deepcopy(variables)
 	combination_list = []
 	number = 0
 	flag = True
-	for i in range(len(allpositive)):
-		allpositive[i] = "+" + allpositive[i]
-	for i in range(len(allnegative)):
-		allnegative[i] = "-" + allnegative[i]
+	for i in range(len(positives)):
+		positives[i] = "+" + positives[i]
+	for i in range(len(negatives)):
+		negatives[i] = "-" + negatives[i]
 
-	for i in range(2**(len(hiddenvariables) - 1)):
+	for i in range(2**(len(variables) - 1)):
 		number = math.ceil(math.sqrt(i))
 		if number == 0:
 			number = 1
 		combination_list = []
-		for j in range(len(hiddenvariables)):
+		for j in range(len(variables)):
 
-			if j == number - 1:
+			if j == (number - 1):
 				if flag:
-					combination_list.append(allpositive[j])
+					combination_list.append(positives[j])
 					flag = False
 				else:
-					combination_list.append(allnegative[j])
+					combination_list.append(negatives[j])
 					flag = True
 			else:
-				combination_list.append(allpositive[j])
+				combination_list.append(positives[j])
 
 		combinations.append(combination_list)
 	reverse_combinations = reverse(combinations)
@@ -259,7 +245,7 @@ def create_permutations(hiddenvariables):
 
 	return combinations
 
-def appendgivenandhidden(given, combinations):
+def append_values(given, combinations):
 	result = []
 	aux = []
 	for i in range(len(combinations)):
