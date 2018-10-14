@@ -4,12 +4,16 @@
 # Juan Carlos Estebes González
 # Salomón Olivera Abud
 # =============================================================================
+from methods import *
 
 def bayes(nodes, probabilities, queries):
+	nodes_list = create_nodes(nodes)
+	probabilities_list = parse_probabilities(probabilities)
+	set_parents(nodes_list, probabilities_list)
+	parse_query(queries, nodes_list)
 	return 0
 
-if __name__ == "__main__":
-
+def main():
 	nodes_names = input()
 	number_p = int(input())
 
@@ -24,3 +28,6 @@ if __name__ == "__main__":
 		queries.append(input())
 
 	bayes(nodes_names, probabilities, queries)
+
+if __name__ == "__main__":
+	main()
