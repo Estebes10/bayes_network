@@ -33,3 +33,19 @@ class Node:
 				elif len(var) == 1: # root node
 					if self.name == var[0]:
 						self.parents = None
+    
+    def completeTable(self):  
+        # save the opposite value of the given param
+		temp = copy.deepcopy(self.table) # temp table
+		for k in self.table:
+            if k[0] == "+":
+                key = k.replace("+", "-", 1)
+				if not key in self.table:
+                    temp[key] = round(1.0 - self.table[k], 4)
+			elif k[0] == "-":
+				key = k.replace("-", "+", 1)
+
+				if not key in self.table:
+					temp[key] = round(1.0 - self.table[k], 4)
+
+		self.table = temp
