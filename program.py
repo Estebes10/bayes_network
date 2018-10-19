@@ -10,8 +10,7 @@ def bayes(nodes, probabilities, queries):
 	nodes_list = create_nodes(nodes)
 	probabilities_list = parse_probabilities(probabilities)
 	add_parents(nodes_list, probabilities_list)
-	parse_query(queries, nodes_list)
-	return 0
+	resolve_queries(queries, nodes_list)
 
 def main():
 	nodes_names = input()

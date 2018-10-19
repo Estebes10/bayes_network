@@ -51,7 +51,7 @@ def get_ancestors(node, list_nodes, ancestors):
 		if node.name not in ancestors:
 			ancestors.append(node.name)
 
-def parse_query(query, node_list): # change probability to conditional probability form
+def resolve_queries(query, node_list): # change probability to conditional probability form
 	for params in query:
 		numerator = ""
 		denominator = ""
@@ -63,7 +63,6 @@ def parse_query(query, node_list): # change probability to conditional probabili
 			numerator = var[0]
 
 		conditional_probability(numerator, denominator, node_list)
-	return 0
 
 def conditional_probability(numerator, denominator, node_list):
 	hidden_numerator = []
@@ -123,7 +122,6 @@ def conditional_probability(numerator, denominator, node_list):
 
 	result = round(value_numerators / value_denominator, 7)
 	print(result)
-	return 0
 
 def save_parents_array(list_nodes, node, probabilities, list, val, element = '3'):
 	var = node.replace("+", "")

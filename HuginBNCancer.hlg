@@ -1,0 +1,97 @@
+Fri Oct 19 11:37:09 2018
+
+
+Moral links:
+
+    Marrying Pollution and Smoker
+
+
+Triangulating prime component with 2 members:
+    XRay, Cancer
+This component is a clique of cost 4
+
+Triangulating prime component with 2 members:
+    Dysponea, Cancer
+This component is a clique of cost 4
+
+Triangulating prime component with 3 members:
+    Cancer, Smoker, Pollution
+This component is a clique of cost 8
+
+
+Total cost of triangulation for all prime components is 16
+
+
+Elimination sequence:
+
+    Pollution
+    Smoker
+    XRay
+    Dysponea
+    Cancer
+
+
+Cliques:
+
+Clique 3, 2 members, table size = 4:
+    Cancer, Dysponea
+
+Clique 2, 2 members, table size = 4:
+    Cancer, XRay
+
+Clique 1, 3 members, table size = 8:
+    Cancer, Smoker, Pollution
+
+Total clique table size: 16
+
+
+The junction forest:
+
+Creating junction tree with clique 3 as root ...
+
+Cliques 2 and 3 linked, separator has 1 member and table size = 2:
+    Cancer
+
+Cliques 1 and 3 linked, separator has 1 member and table size = 2:
+    Cancer
+
+
+Assignment of potentials to cliques:
+
+    Node Dysponea assigned to clique 3
+    Node XRay assigned to clique 2
+    Node Cancer assigned to clique 1
+    Node Smoker assigned to clique 1
+    Node Pollution assigned to clique 1
+
+
+Checking conditional probability potentials:
+
+Warning: Conditional distributions for Cancer sum to different values:
+    min = 0.1
+    max = 1
+
+    No errors found
+
+
+Beliefs for chance nodes:
+
+    Dysponea:
+	+Dysponea  0.338721
+	-Dysponea  0.66128
+
+    XRay:
+	+XRay      0.277441
+	-XRay      0.722559
+
+    Cancer:
+	+Cancer    0.11063
+	-Cancer    0.88937
+
+    Smoker:
+	+Smoker    0.3
+	-Smoker    0.7
+
+    Pollution:
+	+Pollution 0.1
+	-Pollution 0.9
